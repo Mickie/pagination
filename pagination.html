@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link href="bootstrap.css" rel="stylesheet">
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.3.1.1.min.js"></script>
+    <style>
+        .container{
+            padding-top:10px;
+            padding-bottom:10px;
+        }
+        .pagination>.disabled>a{
+            background-color:transparent;
+            border-color:#ddd;
+            cursor:auto;
+        }
+        .pagination>.disabled>a:hover{
+            background-color:#f3f3f3;
+            border-color:#ddd;
+            cursor:auto;
+        }
+    </style>
+</head>
+<body>
+<div class="pagination"></div>
+<script>
+    var currentPage=1;
+    var totalPages =12;
+    var prePage = currentPage;
+    init(5);
+
+   function init(liNum){
+       createPageLi(liNum,$('.pagination'),'init');
+   }
+
+    function pre(liNum){
+        if(prePage > liNum){
+            createPageLi(liNum,$('.pagination'),'pre');
+        }
+    }
+
+    function next(liNum){
+        if(totalPages-prePage >= liNum){
+            createPageLi(liNum,$('.pagination'),'next');
+        }
+    }
+
+    function createPageLi (liNum,$obj,condition){
+        var el = $obj,
+            lis = liNum,
+            theHtml = returnHtml(lis,condition);
+        el.html(theHtml);
+        styleActive(el,currentPage);
+    }
+    function returnHtml(lis,param){
+        var ul =document.createElement('ul');
+        var preLi="<ul class='pagination pagination-sm'><li><a href='javascript:void(0);'onclick='pre("+lis+")'>&laquo;</a></li>";
+        var endLi="<li><a href='javascript:void(0);' onclick='next("+lis+");'>&raquo;</a></li></ul>";
+        var content = returnLiBody(lis,param);
+        ul.innerHTML=preLi+content+endLi;
+        return ul;
+    }
+
+    function returnLiBody(lis,param){
+        var output= '';
+            var startLi_id = calc_first_li(lis,param);
+            var endLi_id = calc_last_li(lis,startLi_id,param);
+            for(var i=startLi_id;i<endLi_id;i++){
+                output +="<li id='num"+i+"' class='disabled'><a href='javascript:void(0);' onclick='aClickEvent(this)'>"+i+"</a></li>";
+            }
+        prePage=startLi_id;
+        return output;
+    }
+
+    function calc_first_li(lis,param){
+        if(param == 'init'){
+            var li_id =(currentPage % lis == 0)?(Math.floor(currentPage/lis)-1)*lis+1 : (Math.floor(currentPage/lis))*lis+1;
+        }else if(param == 'pre'){
+            var li_id =(prePage % lis ==0 && prePage !== lis)?(Math.floor(prePage/lis)-2)*lis+1:(Math.floor(prePage/lis)-1)*lis+1;
+        }else if(param == 'next'){
+            var li_id =((prePage % lis) ==0 )?(Math.floor(prePage/lis))*lis+1 : (Math.floor(prePage/lis)+1)*lis+1;
+        }
+        return li_id;
+    }
+    function calc_last_li(lis,start_li_id,param){
+        if(param == 'init'){
+            var li_id =(totalPages-currentPage >= lis )?(start_li_id+ lis) : totalPages +1;
+        }else if(param == 'pre'){
+            var li_id=start_li_id+lis;
+        }else if (param =='next'){
+            var li_id=(start_li_id+lis<=totalPages)? start_li_id+lis : totalPages+1;
+        }
+        return li_id;
+    }
+    function styleActive($obj,id){
+        var el =$("li.active");
+        var target = $("#num"+id);
+        $obj.find(el).attr('class','disabled');
+        target.attr('class','active');
+    }
+
+    function aClickEvent(obj){
+        var el = $('.pagination');
+        if((obj.innerHTML!=="&laquo;") && (obj.innerHTML!=="&raquo;")){
+            currentPage=obj.innerHTML;
+            styleActive(el,currentPage);
+        };
+        //ajax
+    }
+
+</script>
+</body>
+</html>
